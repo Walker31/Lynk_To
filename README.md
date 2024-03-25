@@ -1,6 +1,6 @@
-# llm_noticeboard
+# Lynk_To
 
-A new Flutter project.
+Student Scehdule Management App
 
 ## Getting Started
 
