@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
 
@@ -7,21 +6,17 @@ class Auth {
   final Logger logger = Logger();
 
   Future<int?> login(int rollno, String password) async {
-    logger.d("Entered login func");
+    logger.d("Entered login function");
     try {
-
-      logger.d("enterterd try");
-      logger.d(password);
-      logger.d(rollno);
       http.Response response = await http.post(
         Uri.parse('http://localhost:3000/login'),
         headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-    body: jsonEncode(<String, dynamic>{
-        'rollno': rollno,
-        'password': password,
-      }),
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(<String, dynamic>{
+          'rollno': rollno,
+          'password': password,
+        }),
       );
       logger.d(response.body);
       return response.statusCode;
@@ -35,11 +30,14 @@ class Auth {
     try {
       http.Response response = await http.post(
         Uri.parse('http://localhost:3000/create_user'),
-        body: {
-          "name": name,
-          "rollno": rollno.toString(),
-          "password": password,
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
         },
+        body: jsonEncode(<String, dynamic>{
+          'name': name,
+          'rollno': rollno,
+          'password': password,
+        }),
       );
       return response.statusCode;
     } catch (e) {

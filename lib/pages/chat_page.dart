@@ -222,7 +222,7 @@ class _ChatPageState extends State<ChatPage> {
       if (messages != null) {
         List<ChatMessageModel> chatMessages = messages.map((message) {
           return ChatMessageModel(
-            rollno: message.rollno,
+            rollno: message.rollno.toString(),
             message: message.message,
             timestamp: message.timestamp, // Assuming timestamp is in ISO 8601 format
           );

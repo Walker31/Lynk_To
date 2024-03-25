@@ -7,7 +7,7 @@ class MessageModel {
 
   final String message;
   final DateTime timestamp;
-  final String rollno;
+  final int rollno;
 
   factory MessageModel.fromJson(Map<String, dynamic> json) {
     return MessageModel(

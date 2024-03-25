@@ -12,97 +12,78 @@ app.use(cors());
 
 app.use(bodyParser.json());
 
-const mongoURI = 'mongodb+srv://Walker:helloworld@lynk.aaroyqj.mongodb.net/?retryWrites=true&w=majority&appName=Lynk';
-const mongoClient = new MongoClient(mongoURI);
-
-mongoClient.connect()
-  .then(async () => {
-    console.log('Connected to MongoDB');
-    const db = mongoClient.db('lynk_to');
-    const usersCollection = db.collection('users');
-    const messagesCollection = db.collection('messages');
-
-    app.post("/create_user", async (req, res) => {
-      const { name, rollno, password } = req.body;
-
-      if (!name || !rollno || !password) {
-        return res.status(422).json({ error: "Please fill in all the required fields." });
-      }
-
-      try {
-        const existingUser = await usersCollection.findOne({ rollno: rollno });
-
-        if (existingUser) {
-          return res.status(422).json({ error: "User with this rollno already exists." });
+    app.post('/create_user', (req, res) => {
+      console.log("in the create user")
+      console.log("req.body",req.body)
+      const { rollno, username, password } = req.body; // Assuming the request body contains user_id, username, and password
+      // Insert the user into the database
+      const query = 'INSERT INTO users (user_id, username, password) VALUES (?, ?, ?)';
+      connection.query(query, [rollno, username, password], (err, result) => {
+        if (err) {
+          console.error('Error creating user:', err);
+          return res.status(500).json({ error: 'Error creating user' });
         }
-
-        const newUser = await usersCollection.insertOne({ name, rollno, password });
-
-        if (newUser && newUser.ops && newUser.ops.length > 0) {
-          return res.status(201).json(newUser.ops[0]);
-        } else {
-          console.error('Error inserting user:', newUser);
-          return res.status(500).json({ error: "Failed to create user." });
-        }
-      } catch (err) {
-        console.error("Error creating user:", err);
-        res.status(500).json({ error: "Something went wrong while creating the user." });
-      }
+        res.status(201).json({ message: 'User created successfully' });
+      });
     });
 
-    app.post("/login", async (req, res) => {
-      const { rollno, password } = req.body;
-
-      if (!rollno || !password) {
-        return res.status(422).json({ error: "Please provide rollno and password." });
-      }
-
-      try {
-        const user = await usersCollection.findOne({ rollno: rollno });
-
-        if (!user) {
-          return res.status(404).json({ error: "User not found." });
+    app.post('/login', (req, res) => {
+      console.log("in the login")
+      console.log("req.body",req.body)
+      const { rollno, password } = req.body; // Assuming the request body contains user_id and password
+      // Check if the user exists in the database
+      const query = 'SELECT * FROM users WHERE user_id = ? AND password = ?';
+      connection.query(query, [rollno, password], (err, result) => {
+        if (err) {
+          console.error('Error during login:', err);
+          return res.status(500).json({ error: 'Error during login' });
         }
-
-        if (user.password !== password) {
-          return res.status(401).json({ error: "Invalid password." });
+        if (result.length === 0) {
+          return res.status(401).json({ error: 'Invalid user_id or password' });
         }
-
-        return res.status(200).json({ message: "Login successful." });
-      } catch (err) {
-        console.error("Error logging in user:", err);
-        res.status(500).json({ error: "Something went wrong while logging in." });
-      }
+        res.json({ message: 'Login successful' });
+      });
     });
 
-    app.get('/messages', async (req, res) => {
-      try {
-        const messages = await messagesCollection.find().toArray();
-        console.log('Fetched messages:', messages);
-        return res.status(200).json(messages);
-      } catch (err) {
-        console.error("Error fetching messages:", err);
-        res.status(500).json({ error: "Something went wrong while fetching messages." });
-      }
+    app.get('/messages', (req, res) => {
+      console.log("in the messages");
+      const query = 'SELECT * FROM messages';
+      connection.query(query, (err, result) => {
+        if (err) {
+          console.error('Error fetching messages:', err);
+          return res.status(500).json({ error: 'Error fetching messages' });
+        }
+        console.log('Messages fetched successfully:', result);
+        res.json(result);
+      });
     });
     
+    
 
-    app.post('/post_message', async (req, res) => {
+    app.post('/post_message', (req, res) => {
       const { rollno, message, timestamp } = req.body;
-
+  
       if (!rollno || !message || !timestamp) {
-        return res.status(422).json({ error: "Please provide rollno, message, and timestamp." });
+          return res.status(422).json({ error: "Please provide rollno, message, and timestamp." });
       }
-
-      try {
-        const newMessage = await messagesCollection.insertOne({ rollno, message, timestamp });
-        console.log('Message has been inserted');
-        res.status(201).json({ message: 'Message posted successfully' });
-      } catch (err) {
-        console.error('Error posting message:', err);
-        res.status(500).json({ error: 'Error posting message' });
-      }
-    });
+  
+      // Construct the SQL query
+      const query = `
+          INSERT INTO messages (rollno, message, timestamp)
+          VALUES (?, ?, ?);
+      `;
+  
+      // Execute the query
+      connection.query(query, [rollno, message, timestamp], (err, result) => {
+          if (err) {
+              console.error('Error posting message:', err);
+              return res.status(500).json({ error: 'Error posting message' });
+          }
+          console.log('Message has been inserted');
+          res.status(201).json({ message: 'Message posted successfully' });
+      });
+  });
+  
 
     app.get('/events', (req, res) => {
       const { event_date, user_id } = req.query;
@@ -131,9 +112,6 @@ mongoClient.connect()
     app.listen(port, () => {
       console.log(`Server is running on http://localhost:${port}`);
     });
-  }).catch(err => {
-    console.error('Error connecting to MongoDB:', err);
-  });
 
 
   app.post('/script', async (req, res) => {
