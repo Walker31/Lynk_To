@@ -7,8 +7,9 @@ import 'package:intl/intl.dart';
 
 
 class CalendarPage extends StatefulWidget {
-  const CalendarPage({Key? key}) : super(key: key);
 
+  final String rollno;
+  const CalendarPage({Key? key, required this.rollno}) : super(key: key);
   @override
   State<CalendarPage> createState() => _CalendarPageState();
 }
@@ -34,7 +35,7 @@ class _CalendarPageState extends State<CalendarPage> {
       logger.d(selectedDate);
       DateTime dateTime = DateTime.parse(selectedDate);
       String date = '${dateTime.year}-${dateTime.month.toString().padLeft(2, '0')}-${dateTime.day.toString().padLeft(2, '0')}';
-      final fetchedEvents = await databaseConnection.fetchEvents(date);
+      final fetchedEvents = await databaseConnection.fetchEvents(date,widget.rollno);
       setState(() {
         events = fetchedEvents;
       });

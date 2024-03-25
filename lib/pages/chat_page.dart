@@ -24,6 +24,9 @@ class ChatPage extends StatefulWidget {
 }
 
 class _ChatPageState extends State<ChatPage> {
+
+  late StreamController<ChatMessageModel> _chatMessagesStreamController;
+  late Stream _chatMessagesStream;
   final List<ChatMessageModel> _allMessagesContainedInTheStream = [];
   final TextEditingController _messageController = TextEditingController();
   String loginRollNo = "107122007";
@@ -33,7 +36,8 @@ class _ChatPageState extends State<ChatPage> {
   @override
   void initState() {
     super.initState();
-    // Fetch messages when the ChatPage is initialized
+    _chatMessagesStreamController = StreamController<ChatMessageModel>.broadcast();
+    _chatMessagesStream = _chatMessagesStreamController.stream;
     _fetchMessages();
   }
 
@@ -48,100 +52,127 @@ class _ChatPageState extends State<ChatPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text(_groupId)),
-      body: StreamBuilder(
-        stream: _chatMessagesStream,
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            return ListView.builder(
-              itemCount: _allMessagesContainedInTheStream.length,
-              itemBuilder: (context, index) {
-                // Format the timestamp to display in AM/PM format
-                String formattedTimestamp = DateFormat('hh:mm a').format(
-                    _allMessagesContainedInTheStream[index].timestamp);
-
-                return Column(
-                  crossAxisAlignment: _allMessagesContainedInTheStream[index].rollno == loginRollNo
-                      ? CrossAxisAlignment.end // Align messages to the right if rollno matches loginRollNo
-                      : CrossAxisAlignment.start, // Align messages to the left for other rollnos
-                  children: [
-                    Row(
-                      mainAxisAlignment: _allMessagesContainedInTheStream[index].rollno == loginRollNo
-                          ? MainAxisAlignment.end // Align message to the right if rollno matches loginRollNo
-                          : MainAxisAlignment.start, // Align message to the left for other rollnos
-                      children: [
-                        Container(
-                          margin: const EdgeInsets.fromLTRB(10, 5, 10, 0),
-                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(_allMessagesContainedInTheStream[index].rollno == loginRollNo ? 20 : 0),
-                              topRight: Radius.circular(_allMessagesContainedInTheStream[index].rollno != loginRollNo ? 20 : 0),
-                              bottomLeft: const Radius.circular(20),
-                              bottomRight: const Radius.circular(20),
-                            ),
-                            color: _allMessagesContainedInTheStream[index].rollno == loginRollNo
-                                ? Colors.blue.shade400 // Color for messages sent by current user
-                                : Colors.grey.shade400, // Default color for other messages
+      body: Column(
+        children: [
+          Expanded(
+            child: StreamBuilder(
+              stream: _chatMessagesStream,
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  return ListView.builder(
+                    itemCount: _allMessagesContainedInTheStream.length,
+                    itemBuilder: (context, index) {
+                      // Format the timestamp to display in AM/PM format
+                      String formattedTimestamp = DateFormat('hh:mm a').format(
+                          _allMessagesContainedInTheStream[index].timestamp);
+            
+                      return Column(
+                        crossAxisAlignment: _allMessagesContainedInTheStream[index].rollno == loginRollNo
+                            ? CrossAxisAlignment.end // Align messages to the right if rollno matches loginRollNo
+                            : CrossAxisAlignment.start, // Align messages to the left for other rollnos
+                        children: [
+                          Row(
+                            mainAxisAlignment: _allMessagesContainedInTheStream[index].rollno == loginRollNo
+                                ? MainAxisAlignment.end // Align message to the right if rollno matches loginRollNo
+                                : MainAxisAlignment.start, // Align message to the left for other rollnos
+                            children: [
+                              Container(
+                                margin: const EdgeInsets.fromLTRB(10, 5, 10, 0),
+                                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.only(
+                                    topLeft: Radius.circular(_allMessagesContainedInTheStream[index].rollno == loginRollNo ? 20 : 0),
+                                    topRight: Radius.circular(_allMessagesContainedInTheStream[index].rollno != loginRollNo ? 20 : 0),
+                                    bottomLeft: const Radius.circular(20),
+                                    bottomRight: const Radius.circular(20),
+                                  ),
+                                  color: _allMessagesContainedInTheStream[index].rollno == loginRollNo
+                                      ? Colors.blue.shade400 // Color for messages sent by current user
+                                      : Colors.grey.shade400, // Default color for other messages
+                                ),
+                                child: Text(
+                                  _allMessagesContainedInTheStream[index].message!,
+                                  softWrap: true,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
-                          child: Text(
-                            _allMessagesContainedInTheStream[index].message!,
-                            softWrap: true,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 15,
-                              fontWeight: FontWeight.w500,
+                          Padding(
+                            padding: EdgeInsets.fromLTRB(
+                              _allMessagesContainedInTheStream[index].rollno == loginRollNo ? 0 : 20,
+                              0,
+                              _allMessagesContainedInTheStream[index].rollno != loginRollNo ? 0 : 20,
+                              10,
+                            ),
+                            child: Text(
+                              formattedTimestamp,
+                              textAlign: _allMessagesContainedInTheStream[index].rollno == loginRollNo
+                                  ? TextAlign.end // Align timestamp to the right if rollno matches loginRollNo
+                                  : TextAlign.start, // Align timestamp to the left for other rollnos
+                              style: const TextStyle(
+                                color: Colors.grey,
+                                fontSize: 12,
+                              ),
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                    Padding(
-                      padding: EdgeInsets.fromLTRB(
-                        _allMessagesContainedInTheStream[index].rollno == loginRollNo ? 0 : 20,
-                        0,
-                        _allMessagesContainedInTheStream[index].rollno != loginRollNo ? 0 : 20,
-                        10,
-                      ),
-                      child: Text(
-                        formattedTimestamp,
-                        textAlign: _allMessagesContainedInTheStream[index].rollno == loginRollNo
-                            ? TextAlign.end // Align timestamp to the right if rollno matches loginRollNo
-                            : TextAlign.start, // Align timestamp to the left for other rollnos
-                        style: const TextStyle(
-                          color: Colors.grey,
-                          fontSize: 12,
-                        ),
-                      ),
-                    ),
-                  ],
-                );
+                        ],
+                      );
+                    },
+                  );
+                } else {
+                  return const Center(child: Text("No messages yet"));
+                }
               },
-            );
-          } else {
-            return const Center(child: Text("No messages yet"));
-          }
-        },
-      ),
-      bottomSheet: Container(
-        padding: const EdgeInsets.all(10),
-        height: 70,
-        child: Row(
-          children: [
-            Expanded(
-              child: TextField(
-                controller: _messageController,
-                decoration: const InputDecoration(
-                  hintText: "Type a message",
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            decoration: BoxDecoration(
+              color: Colors.grey.shade200,
+              borderRadius: BorderRadius.circular(24),
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _messageController,
+                    decoration: const InputDecoration(
+                      hintText: "Type a message",
+                      border: InputBorder.none,
+                      contentPadding: EdgeInsets.zero,
+                      hintStyle: TextStyle(color: Colors.grey),
+                    ),
+                  ),
                 ),
-              ),
+                const SizedBox(width: 8),
+                Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(24),
+                    onTap: () => _sendMessage(loginRollNo),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Icon(
+                        Icons.send,
+                        color: Theme.of(context).primaryColor,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
-            IconButton(
-            onPressed: () => _sendMessage(loginRollNo), // Pass a function reference
-            icon: const Icon(Icons.send),
-            ),
-          ],
-        ),
+                    ),
+          ),
+        ],
       ),
+      
     );
   }
 
@@ -157,8 +188,11 @@ class _ChatPageState extends State<ChatPage> {
             timestamp: message.timestamp, // Assuming timestamp is in ISO 8601 format
           );
         }).toList();
-        _allMessagesContainedInTheStream.addAll(chatMessages);
-        _chatMessagesStreamController.addStream(Stream.fromIterable(chatMessages));
+        if (mounted) {
+          _allMessagesContainedInTheStream.clear(); // Clear existing messages
+          _allMessagesContainedInTheStream.addAll(chatMessages);
+          _chatMessagesStreamController.addStream(Stream.fromIterable(chatMessages));
+        }
       }
     } catch (e) {
       logger.e('Error fetching messages: $e'); // Log error with level "error"
@@ -174,7 +208,7 @@ void _sendMessage(String loginRollNo) async {
   // Replace with actual login roll number
   int statusCode = await Message().postMessage(rollno, message, timestamp);
 
-  if (statusCode == 200) {
+  if (statusCode == 201) {
     // Create a new ChatMessageModel object
     ChatMessageModel newMessage = ChatMessageModel(
       rollno: loginRollNo,
@@ -183,6 +217,9 @@ void _sendMessage(String loginRollNo) async {
     );
 
     // Add the new message to the stream controller
+    setState(() {
+      _allMessagesContainedInTheStream.add(newMessage);
+    });
     _chatMessagesStreamController.add(newMessage);
 
     // Clear the message input field

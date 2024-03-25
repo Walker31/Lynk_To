@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:llm_noticeboard/Api/auth.dart';
+import 'package:llm_noticeboard/pages/_calendar.dart';
 import 'package:llm_noticeboard/pages/home_page.dart';
 import 'package:llm_noticeboard/pages/register_page.dart';
 import 'package:logger/logger.dart'; // Import the logger package
@@ -107,10 +108,12 @@ class _LoginState extends State<Login> {
                   logger.d('Logging in with Password: ${password.text}'); // Log Password
 
                   int? response = await Auth().login(int.parse(rollno.text), password.text);
-                  logger.d('Login Response Code: $response'); // Log Login Response Code
+                  logger.d('Login Response Code: $response');
 
                   if (response == 200) {
+                    CalendarPage(rollno: rollno.text);
                     Navigator.push(
+                      
                       // ignore: use_build_context_synchronously
                       context,
                       MaterialPageRoute(

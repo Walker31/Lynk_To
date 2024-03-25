@@ -5,10 +5,10 @@ import 'package:logger/logger.dart';
 class DatabaseConnection {
   final Logger _logger = Logger();
 
-  Future<List<dynamic>> fetchEvents(String selectedDate) async {
+  Future<List<dynamic>> fetchEvents( String eventDate,String userId) async {
     try {
       final response = await http.get(
-        Uri.parse('http://localhost:3000/events/108121009/$selectedDate'),
+        Uri.parse('http://localhost:3000/events?user_id=$userId&event_date=$eventDate'),
       );
 
       // Log the request URL and response status code
