@@ -12,7 +12,7 @@ app.use(cors());
 
 app.use(bodyParser.json());
 
-const mongoURI = 'mongodb://localhost:27017/';
+const mongoURI = 'mongodb+srv://Walker:helloworld@lynk.aaroyqj.mongodb.net/?retryWrites=true&w=majority&appName=Lynk';
 const mongoClient = new MongoClient(mongoURI);
 
 mongoClient.connect()

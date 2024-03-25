@@ -12,7 +12,6 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.prompts import PromptTemplate
 from langchain_core.pydantic_v1 import BaseModel
 from pydantic import Field
-import typing
 from pytz import timezone
 import re
 import pymysql
@@ -20,13 +19,9 @@ from datetime import datetime
 import pytz
 from IPython.display import Markdown
 import re
-import psycopg2
-import datetime
-import json
-from typing import TypedDict, List, Annotated
+from typing import TypedDict, List
 from langchain.output_parsers.enum import EnumOutputParser
 from enum import Enum
-from typing import Optional
 
 from langchain.output_parsers import PydanticOutputParser
 from langchain.prompts import PromptTemplate
@@ -51,6 +46,8 @@ results= cursor.fetchall()
  
 # Define IST timezone using pytz
 ist_tz = pytz.timezone('Asia/Kolkata')  # Replace with 'UTC' for your system's time
+
+from datetime import datetime
 
 # Get today's date in IST timezone
 now_ist = datetime.now(ist_tz)
@@ -112,14 +109,18 @@ CREATE TABLE EVENTS(
  Subject Details (subject_id, subject_name, subject_code):
 
     Subject_id	Name	Code
-    1 Antennas ECPC12
-    2 Wireless communications ECPC14
-    3 Analog communications ECPC16
-    4 Digital communication ECPC18
-    5 Semiconductor physics ECPE20
-    6 EM waves ECLR22
-    7 Microwaves Laboratory ECLR24
-    8 Fiber optics Laboratory ECPE26
+
+    1 Industrial Lecture ECIR19
+    2 Wireless Communication ECPC22
+    3 VLSI Systems ECPC23
+    4 Microwave Electronics ECPC24
+    5 Communication Engineering Laboratory ECLR16
+    6 Microwave & Fiber Optic Laboratory ECLR16
+    7 Professional Ethics(Circuit) HSIR14
+    8 Electromagnetic Interference and Compatibility ECPE42
+    9 Embedded Systems ECPE14
+    10 Fiber Optic Communication ECPE31
+    11 Digital Signal Processing for Wireless Communication ECPE32
 
 {format_instructions}
 The Input event is : {query}
@@ -164,14 +165,17 @@ CREATE TABLE EVENTS(
  Subject Details:
 
     Subject_id	Name	Code
-    1 Antennas ECPC12
-    2 Wireless communications ECPC14
-    3 Analog communications ECPC16
-    4 Digital communication ECPC18
-    5 Semiconductor physics ECPE20
-    6 EM waves ECLR22
-    7 Microwaves Laboratory ECLR24
-    8 Fiber optics Laboratory ECPE26
+    1 Industrial Lecture ECIR19
+    2 Wireless Communication ECPC22
+    3 VLSI Systems ECPC23
+    4 Microwave Electronics ECPC24
+    5 Communication Engineering Laboratory ECLR16
+    6 Microwave & Fiber Optic Laboratory ECLR16
+    7 Professional Ethics(Circuit) HSIR14
+    8 Electromagnetic Interference and Compatibility ECPE42
+    9 Embedded Systems ECPE14
+    10 Fiber Optic Communication ECPE31
+    11 Digital Signal Processing for Wireless Communication ECPE32
 
 
 {format_instructions}
@@ -299,8 +303,7 @@ prompt_event_generator= PromptTemplate(
         "format_instructions": parser_event.get_format_instructions(),
         "Event_types" : "Different event_types that database contain : Assignment ; Quiz ; Presentation ; Lab Session ; Midterm ; Project Deadline ; Discussion ; Exam ; Class",
         "current date" : str(now_ist.date()),
-        "Subject Details" : "{Subject_id;Name;Code]:[1;Antennas;ECPC12];[2;Wireless communications; ECPC14];[3;Analog communications;ECPC16];[4;Digital communication;ECPC18];[5;Semiconductor physics;ECPE20];[6;EM waves;ECLR22];[7;Microwaves Laboratory;ECLR24];[8;Fiber optics Laboratory;ECPE26]"
-
+        "Subject Details" : "{Subject_id;Name;Code]:[1;Industrial Lecture;ECIR19];[2;Wireless Communication;ECPC22];[3;VLSI Systems;ECPC23];[4;Microwave Electronics;ECPC24];[5;Communication Engineering Laboratory;ECLR16];[6;Microwave & Fiber Optic Laboratory;ECLR16];[7;Professional Ethics(Circuit);HSIR14];[8;Electromagnetic Interference and Compatibility;ECPE42];[9;Embedded Systems;ECPE14];[10;Fiber Optic Communication;ECPE31];[11;Digital Signal Processing for Wireless Communication;ECPE32]"
     }
 )
 
@@ -311,8 +314,7 @@ prompt_event_generator_u = PromptTemplate(
         "format_instructions": parser_reschedule_event.get_format_instructions(),
         "Event_types" : "Different event_types that database contain : Assignment ; Quiz ; Presentation ; Lab Session ; Midterm ; Project Deadline ; Discussion ; Exam ; Class",
         "current date" : str(now_ist.date()),
-        "Subject Details" : "{Subject_id;Name;Code]:[1;Antennas;ECPC12];[2;Wireless communications; ECPC14];[3;Analog communications;ECPC16];[4;Digital communication;ECPC18];[5;Semiconductor physics;ECPE20];[6;EM waves;ECLR22];[7;Microwaves Laboratory;ECLR24];[8;Fiber optics Laboratory;ECPE26]"
-
+        "Subject Details" : "{Subject_id;Name;Code]:[1;Industrial Lecture;ECIR19];[2;Wireless Communication;ECPC22];[3;VLSI Systems;ECPC23];[4;Microwave Electronics;ECPC24];[5;Communication Engineering Laboratory;ECLR16];[6;Microwave & Fiber Optic Laboratory;ECLR16];[7;Professional Ethics(Circuit);HSIR14];[8;Electromagnetic Interference and Compatibility;ECPE42];[9;Embedded Systems;ECPE14];[10;Fiber Optic Communication;ECPE31];[11;Digital Signal Processing for Wireless Communication;ECPE32]"
     }
 )
 
@@ -321,7 +323,6 @@ prompt_retriever = PromptTemplate(
     input_variables=["event"],
     partial_variables = {"format_instructions": parser_sql.get_format_instructions()})
 
-query = "Tomorrow's Antennas exam at 5:00pm is preponed to today 8:00pm"
 
 
 chain_c = prompt_classifier | llm
