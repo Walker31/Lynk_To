@@ -1,6 +1,6 @@
-import pathlib
-import textwrap
-
+import re
+import pymysql
+from datetime import datetime
 import google.generativeai as genai
 
 from IPython.display import display
@@ -14,35 +14,41 @@ from langchain_core.pydantic_v1 import BaseModel
 from pydantic import Field
 import typing
 from pytz import timezone
-llm = ChatGoogleGenerativeAI(model="gemini-pro",temperature=0.8,convert_system_message_to_human=True)
-
 import re
 import pymysql
 from datetime import datetime
+import pytz
+from IPython.display import Markdown
+import re
+import psycopg2
+import datetime
+import json
+from typing import TypedDict, List, Annotated
+from langchain.output_parsers.enum import EnumOutputParser
+from enum import Enum
+from typing import Optional
+
+from langchain.output_parsers import PydanticOutputParser
+from langchain.prompts import PromptTemplate
+from langchain_core.pydantic_v1 import BaseModel, Field, validator
+
+
+
+llm = ChatGoogleGenerativeAI(model="gemini-pro",temperature=0.8,convert_system_message_to_human=True)
+
+
 
 host = 'localhost'  # Use your Ngrok URL
-port = 3050 # Use the port provided by Ngrok
+port = 3306 # Use the port provided by Ngrok
 user = 'root'
-password = 'Shiva242004'
-database = 'link_too'
+password = 'helloworld'
+database = 'lynk_to'
 connection = pymysql.connect(host= host, user=user, password=password, database=database, port=port)
 cursor=connection.cursor()
 q='Select * from subjects;'
 cursor.execute(q)
 results= cursor.fetchall()
  
- 
-from IPython.display import Markdown
-
-
- 
-
-import re
-import pymysql
-from datetime import datetime
-import pytz
- 
-from datetime import datetime
 # Define IST timezone using pytz
 ist_tz = pytz.timezone('Asia/Kolkata')  # Replace with 'UTC' for your system's time
 
@@ -216,18 +222,7 @@ Generate a SQL code to UPDATE the row that is mentioned in the old_event  to mak
  '''
 
 
-import re
-import psycopg2
-import datetime
-import json
-from typing import TypedDict, List, Annotated
-from langchain.output_parsers.enum import EnumOutputParser
-from enum import Enum
-from typing import Optional
 
-from langchain.output_parsers import PydanticOutputParser
-from langchain.prompts import PromptTemplate
-from langchain_core.pydantic_v1 import BaseModel, Field, validator
 
 class WORK(Enum):
     INSERT = "INSERT"

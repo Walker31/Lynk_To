@@ -2,14 +2,15 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:llm_noticeboard/components/calendar_card.dart';
 import 'package:llm_noticeboard/database/database_connection.dart';
+import 'package:llm_noticeboard/database/user_details.dart';
 import 'package:logger/logger.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 
 class CalendarPage extends StatefulWidget {
 
-  final String rollno;
-  const CalendarPage({Key? key, required this.rollno}) : super(key: key);
+  const CalendarPage({Key? key}) : super(key: key);
   @override
   State<CalendarPage> createState() => _CalendarPageState();
 }
@@ -18,6 +19,8 @@ class _CalendarPageState extends State<CalendarPage> {
   late StreamController<String> _streamController;
   List<dynamic> events = [];
   final logger = Logger();
+  late String loginRollNo;
+  
 
   @override
   void initState() {
@@ -26,7 +29,11 @@ class _CalendarPageState extends State<CalendarPage> {
     _streamController.stream.listen((date) {
       fetchEvents(date); // Listen to changes in selected date
     });
-    fetchEvents(DateTime.now().toString()); // Initial fetch with current date
+    fetchEvents(DateTime.now().toString());
+    final userDetails = Provider.of<UserProvider>(context, listen: false).userDetails;
+    if (userDetails != null) {
+      loginRollNo = userDetails.rollNo;
+    } // Initial fetch with current date
   }
 
   Future<void> fetchEvents(String selectedDate) async {
@@ -35,7 +42,7 @@ class _CalendarPageState extends State<CalendarPage> {
       logger.d(selectedDate);
       DateTime dateTime = DateTime.parse(selectedDate);
       String date = '${dateTime.year}-${dateTime.month.toString().padLeft(2, '0')}-${dateTime.day.toString().padLeft(2, '0')}';
-      final fetchedEvents = await databaseConnection.fetchEvents(date,widget.rollno);
+      final fetchedEvents = await databaseConnection.fetchEvents(date,loginRollNo);
       setState(() {
         events = fetchedEvents;
       });

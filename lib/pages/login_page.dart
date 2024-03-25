@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:llm_noticeboard/Api/auth.dart';
+import 'package:llm_noticeboard/database/user_details.dart';
 import 'package:llm_noticeboard/pages/_calendar.dart';
 import 'package:llm_noticeboard/pages/home_page.dart';
 import 'package:llm_noticeboard/pages/register_page.dart';
-import 'package:logger/logger.dart'; // Import the logger package
+import 'package:logger/logger.dart';
+import 'package:provider/provider.dart'; // Import the logger package
 
 class Login extends StatefulWidget {
   const Login({Key? key}) : super(key: key);
@@ -111,7 +113,12 @@ class _LoginState extends State<Login> {
                   logger.d('Login Response Code: $response');
 
                   if (response == 200) {
-                    CalendarPage(rollno: rollno.text);
+                    const CalendarPage();
+                    // ignore: use_build_context_synchronously
+                    Provider.of<UserProvider>(context, listen: false).setUserDetails(
+                    rollno.text,
+                    password.text,
+                    );
                     Navigator.push(
                       
                       // ignore: use_build_context_synchronously

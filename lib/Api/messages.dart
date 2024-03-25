@@ -47,7 +47,7 @@ class Message {
     }
   }
 
-  Future<void> sendMessage(String message) async {
+  Future<void> script(String message) async {
   const url = 'http://localhost:3000/script';
   try {
     final response = await http.post(

@@ -3,17 +3,17 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:llm_noticeboard/Api/messages.dart';
+import 'package:llm_noticeboard/database/user_details.dart';
 import 'package:llm_noticeboard/models/chat_model.dart';
 import 'package:llm_noticeboard/models/message_model.dart';
 import 'package:logger/logger.dart';
+import 'package:provider/provider.dart';
 
-var _groupId;
-StreamController<ChatMessageModel> _chatMessagesStreamController =
-    StreamController<ChatMessageModel>.broadcast();
-Stream _chatMessagesStream = _chatMessagesStreamController.stream;
+var _groupId="";
 
+// ignore: must_be_immutable
 class ChatPage extends StatefulWidget {
-  final groupId;
+  late String groupId;
 
   ChatPage(this.groupId, {Key? key}) : super(key: key) {
     _groupId = groupId;
@@ -29,13 +29,18 @@ class _ChatPageState extends State<ChatPage> {
   late Stream _chatMessagesStream;
   final List<ChatMessageModel> _allMessagesContainedInTheStream = [];
   final TextEditingController _messageController = TextEditingController();
-  String loginRollNo = "107122007";
+  late String loginRollNo;
+  bool isIconButtonSelected = false;
   // Initialize logger instance
   Logger logger = Logger();
 
   @override
   void initState() {
     super.initState();
+    final userDetails = Provider.of<UserProvider>(context, listen: false).userDetails;
+    if (userDetails != null) {
+      loginRollNo = userDetails.rollNo;
+    }
     _chatMessagesStreamController = StreamController<ChatMessageModel>.broadcast();
     _chatMessagesStream = _chatMessagesStreamController.stream;
     _fetchMessages();
@@ -71,6 +76,27 @@ class _ChatPageState extends State<ChatPage> {
                             ? CrossAxisAlignment.end // Align messages to the right if rollno matches loginRollNo
                             : CrossAxisAlignment.start, // Align messages to the left for other rollnos
                         children: [
+                          ListTile(
+                          title: Row(
+                            mainAxisAlignment: _allMessagesContainedInTheStream[index].rollno == loginRollNo
+                                ? MainAxisAlignment.end // Align roll number to the right if it's the current user's message
+                                : MainAxisAlignment.start, // Align roll number to the left for other messages
+                            children: [
+                              Text(
+                                _allMessagesContainedInTheStream[index].rollno,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 10),
+                          dense: true,
+                          tileColor: Colors.transparent, // Optional: Adjust tile color as needed
+                          horizontalTitleGap: 0, // Optional: Adjust horizontal gap between title and leading widget
+                          visualDensity: const VisualDensity(horizontal: 0, vertical: -4), // Optional: Adjust the density of the ListTile
+                        ),
+
                           Row(
                             mainAxisAlignment: _allMessagesContainedInTheStream[index].rollno == loginRollNo
                                 ? MainAxisAlignment.end // Align message to the right if rollno matches loginRollNo
@@ -131,7 +157,7 @@ class _ChatPageState extends State<ChatPage> {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 16,vertical: 16),
             child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             decoration: BoxDecoration(
@@ -143,13 +169,26 @@ class _ChatPageState extends State<ChatPage> {
                 Expanded(
                   child: TextField(
                     controller: _messageController,
+                    style: const TextStyle(color: Colors.black), // Change text color to black
                     decoration: const InputDecoration(
                       hintText: "Type a message",
                       border: InputBorder.none,
                       contentPadding: EdgeInsets.zero,
-                      hintStyle: TextStyle(color: Colors.grey),
+                      hintStyle: TextStyle(color: Colors.black),
                     ),
                   ),
+                ),
+                const SizedBox(width: 8),
+                IconButton(
+                  icon: const Icon(Icons.book),
+                  color: isIconButtonSelected ? Theme.of(context).primaryColor : Colors.grey,
+                  onPressed: (){
+                      setState(() {
+                    logger.d(isIconButtonSelected);
+                    isIconButtonSelected = !isIconButtonSelected;
+                    logger.d(isIconButtonSelected); // Toggle selection status
+                  });
+                  },
                 ),
                 const SizedBox(width: 8),
                 Material(
@@ -207,6 +246,12 @@ void _sendMessage(String loginRollNo) async {
   String rollno= loginRollNo;
   // Replace with actual login roll number
   int statusCode = await Message().postMessage(rollno, message, timestamp);
+
+  Message messageInstance = Message();
+
+  if(isIconButtonSelected){
+    messageInstance.script(message); // Call script method using the instance
+  }
 
   if (statusCode == 201) {
     // Create a new ChatMessageModel object

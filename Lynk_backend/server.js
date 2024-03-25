@@ -1,8 +1,9 @@
 import express from "express";
 import bodyParser from "body-parser";
 import { MongoClient } from 'mongodb';
-const cors = require('cors');
-import connection from './db.cjs'; // Assuming this file contains MySQL connection setup
+import cors from "cors";
+import connection from './db.cjs';
+import http from "http"; // Assuming this file contains MySQL connection setup
 
 const app = express();
 const port = 3000;
@@ -85,7 +86,6 @@ mongoClient.connect()
       }
     });
     
-    const http = require('http');
 
     app.post('/post_message', async (req, res) => {
       const { rollno, message, timestamp } = req.body;
