@@ -1,1 +1,0 @@
-const db= "Lynk_To"

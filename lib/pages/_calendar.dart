@@ -9,8 +9,8 @@ import 'package:provider/provider.dart';
 
 
 class CalendarPage extends StatefulWidget {
-
   const CalendarPage({Key? key}) : super(key: key);
+
   @override
   State<CalendarPage> createState() => _CalendarPageState();
 }
@@ -19,8 +19,7 @@ class _CalendarPageState extends State<CalendarPage> {
   late StreamController<String> _streamController;
   List<dynamic> events = [];
   final logger = Logger();
-  late String loginRollNo;
-  
+  String loginRollNo="108121001";
 
   @override
   void initState() {
@@ -30,7 +29,8 @@ class _CalendarPageState extends State<CalendarPage> {
       fetchEvents(date); // Listen to changes in selected date
     });
     fetchEvents(DateTime.now().toString());
-    final userDetails = Provider.of<UserProvider>(context, listen: false).userDetails;
+    final userDetails =
+        Provider.of<UserProvider>(context, listen: false).userDetails;
     if (userDetails != null) {
       loginRollNo = userDetails.rollNo;
     } // Initial fetch with current date
@@ -41,8 +41,10 @@ class _CalendarPageState extends State<CalendarPage> {
       final databaseConnection = DatabaseConnection();
       logger.d(selectedDate);
       DateTime dateTime = DateTime.parse(selectedDate);
-      String date = '${dateTime.year}-${dateTime.month.toString().padLeft(2, '0')}-${dateTime.day.toString().padLeft(2, '0')}';
-      final fetchedEvents = await databaseConnection.fetchEvents(date,loginRollNo);
+      String date =
+          '${dateTime.year}-${dateTime.month.toString().padLeft(2, '0')}-${dateTime.day.toString().padLeft(2, '0')}';
+      final fetchedEvents =
+          await databaseConnection.fetchEvents(date, loginRollNo);
       setState(() {
         events = fetchedEvents;
       });
@@ -63,7 +65,10 @@ class _CalendarPageState extends State<CalendarPage> {
           CalendarCard(streamController: _streamController),
           const SizedBox(height: 20),
           Expanded(
-            child: EventListPage(streamController: _streamController, events: events),
+            child: EventListPage(
+              streamController: _streamController,
+              events: events,
+            ),
           ),
         ],
       ),
@@ -81,7 +86,11 @@ class EventListPage extends StatefulWidget {
   final StreamController<String> streamController;
   final List<dynamic> events;
 
-  const EventListPage({Key? key, required this.streamController, required this.events}) : super(key: key);
+  const EventListPage({
+    Key? key,
+    required this.streamController,
+    required this.events,
+  }) : super(key: key);
 
   @override
   EventListPageState createState() => EventListPageState();
@@ -92,48 +101,56 @@ class EventListPageState extends State<EventListPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        automaticallyImplyLeading: false, // Remove back button from AppBar
+        automaticallyImplyLeading: false,
       ),
-      body: ListView.builder(
-      itemCount: widget.events.length,
-      itemBuilder: (context, index) {
-      final event = widget.events[index];
-      final eventTime = event['event_time'];
-      final formattedTime = _formatTime(eventTime); // Format the time
-      return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0), // Add padding
-      child: Card(
-        elevation: 2, // Add elevation for a shadow effect
-        child: ListTile(
-          title: Text(
-            event['subject_name'],
-            style: const TextStyle(
-              fontWeight: FontWeight.bold, // Add bold font weight
+      body: widget.events.isEmpty
+          ? const Center(child: Text("You are Free Today"))
+          : ListView.separated(
+              itemCount: widget.events.length,
+              separatorBuilder: (context, index) => const Divider(),
+              itemBuilder: (context, index) {
+                final event = widget.events[index];
+                final eventTime = event['event_time'];
+                final formattedTime = _formatTime(eventTime);
+                return Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16.0,
+                    vertical: 8.0,
+                  ),
+                  child: Card(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    elevation: 5,
+                    child: ListTile(
+                      title: Text(
+                        event['subject_name'],
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      subtitle: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            event['event_type'],
+                            style: const TextStyle(
+                              fontStyle: FontStyle.italic,
+                            ),
+                          ),
+                          Text(
+                            formattedTime,
+                            style: const TextStyle(
+                              fontStyle: FontStyle.italic,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              },
             ),
-          ),
-          subtitle: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                event['event_type'],
-                style: const TextStyle(
-                  fontStyle: FontStyle.italic, // Italicize event type
-                ),
-              ),
-              Text(
-                formattedTime,
-                style: const TextStyle(
-                  fontStyle: FontStyle.italic, // Italicize formatted time
-                ),
-              ),
-            ],
-          ),// Use the formatted time
-          ), // Add trailing icon
-        ),
-    );
-  },
-),
-
     );
   }
 }

@@ -29,7 +29,7 @@ class _ChatPageState extends State<ChatPage> {
   late Stream _chatMessagesStream;
   final List<ChatMessageModel> _allMessagesContainedInTheStream = [];
   final TextEditingController _messageController = TextEditingController();
-  late String loginRollNo;
+  late String loginRollNo="108121001";
   bool isIconButtonSelected = false;
   // Initialize logger instance
   Logger logger = Logger();
@@ -43,6 +43,7 @@ class _ChatPageState extends State<ChatPage> {
     }
     _chatMessagesStreamController = StreamController<ChatMessageModel>.broadcast();
     _chatMessagesStream = _chatMessagesStreamController.stream;
+    
     _fetchMessages();
   }
 
@@ -171,7 +172,7 @@ class _ChatPageState extends State<ChatPage> {
                     controller: _messageController,
                     style: const TextStyle(color: Colors.black), // Change text color to black
                     decoration: const InputDecoration(
-                      hintText: "Type a message",
+                      hintText: "Type a message....",
                       border: InputBorder.none,
                       contentPadding: EdgeInsets.zero,
                       hintStyle: TextStyle(color: Colors.black),
@@ -180,7 +181,7 @@ class _ChatPageState extends State<ChatPage> {
                 ),
                 const SizedBox(width: 8),
                 IconButton(
-                  icon: const Icon(Icons.book),
+                  icon: const Icon(Icons.lock),
                   color: isIconButtonSelected ? Theme.of(context).primaryColor : Colors.grey,
                   onPressed: (){
                       setState(() {
