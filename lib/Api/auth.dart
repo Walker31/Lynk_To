@@ -9,7 +9,7 @@ class Auth {
     logger.d("Entered login function");
     try {
       http.Response response = await http.post(
-        Uri.parse('http://localhost:3000/login'),
+        Uri.https('link-to-backend.azurewebsites.net','/login'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },
@@ -29,7 +29,7 @@ class Auth {
   Future<int?> signup(String name, int rollno, String password) async {
     try {
       http.Response response = await http.post(
-        Uri.parse('http://localhost:3000/create_user'),
+        Uri.parse('https://link-to-backend.azurewebsites.net/create_user'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },

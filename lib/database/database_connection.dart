@@ -8,7 +8,7 @@ class DatabaseConnection {
   Future<List<dynamic>> fetchEvents( String eventDate,String userId) async {
     try {
       final response = await http.get(
-        Uri.parse('http://localhost:3000/events?user_id=$userId&event_date=$eventDate'),
+        Uri.parse('https://link-to-backend.azurewebsites.net/events?user_id=$userId&event_date=$eventDate'),
       );
 
       // Log the request URL and response status code
