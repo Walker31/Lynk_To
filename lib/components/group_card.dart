@@ -27,7 +27,7 @@ class GroupCard extends StatelessWidget {
           child: Text(
             name,
             style:
-                const TextStyle(color: Colors.black, overflow: TextOverflow.ellipsis),
+                const TextStyle(color: Colors.black, overflow: TextOverflow.ellipsis , fontWeight: FontWeight.bold),
           ),
         ),
       ]),

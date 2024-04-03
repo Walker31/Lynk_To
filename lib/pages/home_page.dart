@@ -14,10 +14,10 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  final List<Widget> pages = const [
-    DashboardPage(key: PageStorageKey('Dashboard')),
-    GroupsPage(key: PageStorageKey('Groups')),
-    CalendarPage(key: PageStorageKey('Calendar')),
+  final List<Widget> pages = [
+    const DashboardPage(key: PageStorageKey('Dashboard')),
+    const GroupsPage(key: PageStorageKey('Groups')),
+    const CalendarPage(key: PageStorageKey('Calendar')),
   ];
 
   final PageStorageBucket bucket = PageStorageBucket();
@@ -33,16 +33,30 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Link To"),
-        automaticallyImplyLeading: false,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: _signOut,
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(kToolbarHeight * 0.7),
+        child: AppBar(
+          backgroundColor: Colors.blue.shade400, // Set the background color to blue shade 400
+          elevation: 0, // Remove the shadow
+          title: const Text(
+            "Lynk To",
+            style: TextStyle(
+              color: Colors.white, // Set the text color to white
+              fontSize: 20, // Adjust the font size
+              fontWeight: FontWeight.bold, // Apply bold font weight
+            ),
           ),
-        ],
+          centerTitle: true, // Center the title horizontally
+          automaticallyImplyLeading: false, // Remove the back button
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.logout, color: Colors.white), // Set icon color to white
+              onPressed: _signOut,
+            ),
+          ],
+        ),
       ),
+
       body: PageStorage(bucket: bucket, child: pages[_selectedIndex]),
       bottomNavigationBar: CurvedNavigationBar(
         index: _selectedIndex,
@@ -52,7 +66,7 @@ class _HomeState extends State<Home> {
         buttonBackgroundColor: Colors.blueAccent,
         items: const [
           Icon(Icons.dashboard, size: 30),
-          Icon(Icons.group, size: 30),
+          Icon(Icons.chat, size: 30),
           Icon(Icons.calendar_today, size: 30),
         ],
         onTap: (index) {

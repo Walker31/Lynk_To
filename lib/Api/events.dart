@@ -2,13 +2,13 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:logger/logger.dart';
 
-class DatabaseConnection {
+class Events {
   final Logger _logger = Logger();
 
   Future<List<dynamic>> fetchEvents( String eventDate,String userId) async {
     try {
       final response = await http.get(
-        Uri.parse('https://link-to-backend.azurewebsites.net/events?user_id=$userId&event_date=$eventDate'),
+        Uri.parse('http://192.168.249.34:3000/events?user_id=$userId&event_date=$eventDate'),
       );
 
       // Log the request URL and response status code

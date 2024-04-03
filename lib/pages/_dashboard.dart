@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:llm_noticeboard/Api/events.dart';
 import 'package:llm_noticeboard/Api/user_info.dart';
-import 'package:llm_noticeboard/database/database_connection.dart';
 import 'package:llm_noticeboard/database/user_details.dart';
 import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
@@ -43,9 +43,10 @@ class _DashboardPageState extends State<DashboardPage> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const CircleAvatar(
-            radius: 40,
-            backgroundColor: Colors.grey,
+         const CircleAvatar(
+          radius: 40,
+          backgroundImage: AssetImage("assets/profile.jpg"),
+          backgroundColor: Colors.grey,
           ),
           const SizedBox(height: 10),
           Text(
@@ -136,7 +137,7 @@ class _DashboardPageState extends State<DashboardPage> {
 
   Future<void> fetchEvents(String selectedDate) async {
     try {
-      final databaseConnection = DatabaseConnection();
+      final databaseConnection = Events();
       logger.d(selectedDate);
       DateTime dateTime = DateTime.parse(selectedDate);
       String date =

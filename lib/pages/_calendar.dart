@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:llm_noticeboard/Api/events.dart';
 import 'package:llm_noticeboard/components/calendar_card.dart';
-import 'package:llm_noticeboard/database/database_connection.dart';
 import 'package:llm_noticeboard/database/user_details.dart';
 import 'package:logger/logger.dart';
 import 'package:intl/intl.dart';
@@ -38,9 +38,10 @@ class _CalendarPageState extends State<CalendarPage> {
 
   Future<void> fetchEvents(String selectedDate) async {
     try {
-      final databaseConnection = DatabaseConnection();
+      final databaseConnection = Events();
       logger.d(selectedDate);
       DateTime dateTime = DateTime.parse(selectedDate);
+      logger.d("selected Date: $dateTime");
       String date =
           '${dateTime.year}-${dateTime.month.toString().padLeft(2, '0')}-${dateTime.day.toString().padLeft(2, '0')}';
       final fetchedEvents =
@@ -63,7 +64,7 @@ class _CalendarPageState extends State<CalendarPage> {
         children: [
           const SizedBox(height: 20),
           CalendarCard(streamController: _streamController),
-          const SizedBox(height: 20),
+          const SizedBox(height: 10),
           Expanded(
             child: EventListPage(
               streamController: _streamController,
@@ -105,53 +106,62 @@ class EventListPageState extends State<EventListPage> {
       ),
       body: widget.events.isEmpty
           ? const Center(child: Text("You are Free Today"))
-          : ListView.separated(
-              itemCount: widget.events.length,
-              separatorBuilder: (context, index) => const Divider(),
-              itemBuilder: (context, index) {
-                final event = widget.events[index];
-                final eventTime = event['event_time'];
-                final formattedTime = _formatTime(eventTime);
-                return Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16.0,
-                    vertical: 8.0,
-                  ),
-                  child: Card(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    elevation: 5,
-                    child: ListTile(
-                      title: Text(
-                        event['subject_name'],
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
+          : Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8.0)),
+            alignment: Alignment.center,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: ListView.separated(
+                    itemCount: widget.events.length,
+                    separatorBuilder: (context, index) => const Divider(),
+                    itemBuilder: (context, index) {
+                      final event = widget.events[index];
+                      final eventTime = event['event_time'];
+                      final formattedTime = _formatTime(eventTime);
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16.0,
+                          vertical: 8.0,
                         ),
-                      ),
-                      subtitle: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            event['event_type'],
-                            style: const TextStyle(
-                              fontStyle: FontStyle.italic,
+                        child: Card(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          elevation: 5,
+                          child: ListTile(
+                            title: Text(
+                              event['subject_name'],
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            subtitle: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  event['event_type'],
+                                  style: const TextStyle(
+                                    fontStyle: FontStyle.italic,
+                                  ),
+                                ),
+                                Text(
+                                  formattedTime,
+                                  style: const TextStyle(
+                                    fontStyle: FontStyle.italic,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                          Text(
-                            formattedTime,
-                            style: const TextStyle(
-                              fontStyle: FontStyle.italic,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+                        ),
+                      );
+                    },
                   ),
-                );
-              },
             ),
-    );
+          ),
+          );
+  
   }
 }
 

@@ -16,7 +16,8 @@ class _GroupsPageState extends State<GroupsPage> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      child: (ListView.separated(
+      child: (
+        ListView.separated(
         itemBuilder: (context, index) {
           return GestureDetector(
             child: GroupCard(groups[index]),

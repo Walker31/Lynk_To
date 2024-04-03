@@ -7,7 +7,7 @@ class UserInfo {
 
   Future<Map<String, dynamic>?> getUserInfo(String rollNo) async {
     try {
-      final response = await http.get(Uri.parse('https://link-to-backend.azurewebsites.net/user_info?user_id=$rollNo'));
+      final response = await http.get(Uri.parse('http://192.168.249.34:3000/user_info?user_id=$rollNo'));
       logger.d('GET User Info Request: ${response.request}');
       if (response.statusCode == 200) {
         Map<String, dynamic> userData = jsonDecode(response.body);

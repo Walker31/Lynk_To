@@ -31,6 +31,12 @@ class _LoginState extends State<Login> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              Image.asset(
+                'assets/NITT.png', // Replace with your image asset path
+                height: 200, // Adjust height as needed
+                width: 200, // Adjust width as needed
+              ),
+              const SizedBox(height: 10),
               const Text(
                 "Login",
                 style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.blue),
