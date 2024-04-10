@@ -9,7 +9,7 @@ class Message {
   Future<List<MessageModel>?> getMessages() async {
     List<MessageModel> messages = [];
     try {
-      final response = await http.get(Uri.parse('http://192.168.249.34:3000/messages'));
+      final response = await http.get(Uri.parse('http://192.168.16.34:3000/messages'));
       logger.d('GET Messages Request: ${response.request}');
       if (response.statusCode == 200) {
         List<dynamic> messageData = jsonDecode(response.body);
@@ -29,7 +29,7 @@ class Message {
     logger.d("rollno $loginRollNo, Message: $message, Timestamp: $timestamp");
     try {
       final response = await http.post(
-        Uri.parse('http://192.168.249.34:3000/post_message'),
+        Uri.parse('http://192.168.16.34:3000/post_message'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },
@@ -48,7 +48,7 @@ class Message {
   }
 
   Future<void> script(String message) async {
-    const url = 'http://127.0.0.1:3000/script';
+    const url = 'http://192.168.16.34:3000/script';
     try {
       final response = await http.post(
         Uri.parse(url),

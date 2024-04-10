@@ -8,7 +8,7 @@ class Events {
   Future<List<dynamic>> fetchEvents( String eventDate,String userId) async {
     try {
       final response = await http.get(
-        Uri.parse('http://192.168.249.34:3000/events?user_id=$userId&event_date=$eventDate'),
+        Uri.parse('http://192.168.16.34:3000/events?user_id=$userId&event_date=$eventDate'),
       );
 
       // Log the request URL and response status code

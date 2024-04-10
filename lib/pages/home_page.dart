@@ -47,7 +47,12 @@ class _HomeState extends State<Home> {
             ),
           ),
           centerTitle: true, // Center the title horizontally
-          automaticallyImplyLeading: false, // Remove the back button
+          automaticallyImplyLeading: false,
+          shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+              bottomRight: Radius.circular(25),
+              bottomLeft: Radius.circular(25)),
+          ), // Remove the back button
           actions: [
             IconButton(
               icon: const Icon(Icons.logout, color: Colors.white), // Set icon color to white
