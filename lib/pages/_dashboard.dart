@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:llm_noticeboard/Api/events.dart';
 import 'package:llm_noticeboard/Api/user_info.dart';
+import 'package:llm_noticeboard/database/dept_details.dart';
 import 'package:llm_noticeboard/database/user_details.dart';
 import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
@@ -20,7 +21,8 @@ class _DashboardPageState extends State<DashboardPage> {
 
   String loginRollNo="108121001";
   late String userName="";
-
+  Department? department;
+  Years? year;
 
   @override
   void initState() {
@@ -29,6 +31,9 @@ class _DashboardPageState extends State<DashboardPage> {
     if (userDetails != null) {
       loginRollNo = userDetails.rollNo;
     }
+    department = DepartmentManager().getDepartment(int.parse(loginRollNo.substring(0, 3)));
+    year=YearManager().getYear(int.parse(loginRollNo.substring(3,6)));
+
     _fetchUserInfo();
     fetchEvents(DateTime.now().toString());
      // Initial fetch with current date
@@ -40,80 +45,111 @@ class _DashboardPageState extends State<DashboardPage> {
     body: Container(
       alignment: Alignment.center,
       padding: const EdgeInsets.all(16.0),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-         const CircleAvatar(
-          radius: 40,
-          backgroundImage: AssetImage("assets/profile.jpg"),
-          backgroundColor: Colors.grey,
-          ),
-          const SizedBox(height: 10),
-          Text(
-            userName,
-            style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 5),
-          Text(
-            loginRollNo,
-            style: const TextStyle(
-              fontSize: 16,
-              color: Colors.grey,
-            ),
-          ),
-          const SizedBox(height: 20),
-
-            // Display fetched events
-            Expanded(
-              child: ListView.builder(
-                itemCount: events.length,
-                itemBuilder: (context, index) {
-                  final event = events[index];
-                  // Customize the display of each event according to your needs
-                  return Card(
-                    elevation: 5,
-                    margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10.0),
+      child:              
+          Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Expanded(
+                    child: Padding(
+                      padding: EdgeInsets.all(15),
+                      child: CircleAvatar(
+                          radius: 60,
+                          backgroundImage: AssetImage("assets/profile.jpg"),
+                          backgroundColor: Colors.grey,
+                          ),
                     ),
-                    child: ListTile(
-                      contentPadding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
-                      title: Text(
-                        event['subject_name'],
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
+                  ),
+                  Expanded(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const SizedBox(height: 5),
+                        Text(
+                          userName,
+                          style: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                      ),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const SizedBox(height: 4.0),
-                          Text(
-                            event['event_type'],
-                            style: const TextStyle(
-                              fontStyle: FontStyle.italic,
-                            ),
+                        const SizedBox(height: 5),
+                        Text(
+                          loginRollNo,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            color: Colors.grey,
                           ),
-                          const SizedBox(height: 4.0),
-                          Text(
-                            'Time: ${event['event_time']}',
-                            style: const TextStyle(
-                              color: Colors.grey,
-                            ),
+                        ),
+                        const SizedBox(height: 5),
+                        Text(
+                          department!.name,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            color: Colors.grey,
                           ),
+                        ),
+                        const SizedBox(height: 5),
+                        Text(
+                          year!.year,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            color: Colors.grey,
+                          ),
+                        ),
                         ],
                       ),
-                      // Add any additional customization or functionality as needed
-                    ),
-                  );
-                },
+                  ),
+                ],
               ),
-            ),
-          ],
-        ),
+              const SizedBox(height: 20),
+                Expanded(
+                      child: ListView.builder(
+                        itemCount: events.length,
+                        itemBuilder: (context, index) {
+                          final event = events[index];
+                          // Customize the display of each event according to your needs
+                          return Card(
+                            elevation: 5,
+                            margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10.0),
+                            ),
+                            child: ListTile(
+                              contentPadding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
+                              title: Text(
+                                event['subject_name'],
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              subtitle: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const SizedBox(height: 4.0),
+                                  Text(
+                                    event['event_type'],
+                                    style: const TextStyle(
+                                      fontStyle: FontStyle.italic,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4.0),
+                                  Text(
+                                    'Time: ${event['event_time']}',
+                                    style: const TextStyle(
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              // Add any additional customization or functionality as needed
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+            ],
+          ),
       ),
     );
   }

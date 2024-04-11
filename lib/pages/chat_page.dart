@@ -59,10 +59,11 @@ class _ChatPageState extends State<ChatPage> {
     return Scaffold(
       appBar: AppBar(title: Text(_groupId)),
       body: Container(
-        decoration: const BoxDecoration(
+        decoration:  BoxDecoration(
           image: DecorationImage(
-            image: AssetImage("assets/chat_background.jpg"),
+            image: const AssetImage("assets/orion.jpg"),
             fit: BoxFit.cover,
+            colorFilter: ColorFilter.mode(Colors.black.withOpacity(0.5),BlendMode.srcOver),
           ),
         ),
         child: Column(
